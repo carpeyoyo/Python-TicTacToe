@@ -14,14 +14,20 @@ class TTT(object):
         Pre: The Tkinter master is supplied.
         Post: Game and window initialized. '''
         self.turn = "O"
-        # Two frames used in window.
+        # Adding menu bar
+        self.themenu = Menu(master)
+        self.file_label_menu = Menu(self.themenu, tearoff=0)
+        self.file_label_menu.add_command(label="New",command = self.new)
+        self.themenu.add_cascade(label="File",menu=self.file_label_menu)
+        master.config(menu=self.themenu)
+        # Frames used in window.
         buttonframe = Frame(master)
         buttonframe.pack()
         frame = Frame(master)
         frame.pack()
-        # Buttons used in window.
-        self.newbutton=Button(buttonframe,text="New",command = self.new)
-        self.newbutton.pack(side=LEFT)
+	# Label in button frame
+	self.label_message = StringVar()
+	Label(buttonframe,textvariable=self.label_message).pack()
         # Rawturtle
         self.canvas = Canvas(frame,width=300,height=300)
         self.canvas.grid()
@@ -33,7 +39,7 @@ class TTT(object):
         # Draws initial grid.
         self.creategrid()
         # Initializes Game.
-        self.g = game(self.turtle)
+        self.g = game(self.turtle,self.label_message)
 
     def new(self):
         '''Creates new game.
@@ -141,13 +147,15 @@ class TTT(object):
 class game(TTT):
     """Contains all necessary variables and methods to play tictactoe alone."""
 
-    def __init__(self,t):
+    def __init__(self,t,message_box):
         '''Initializes Instance Variables.'''
         self.board = [[".",".","."],[".",".","."],[".",".","."]] # creates an representation of an empty tictactoe board.
         self.turn = "X" # First turn is always starts with "X"
         self.numberofturns = 0 # In order to know when to end game in the case of a draw.
         self.turtle = t # The turtle used to draw the shapes.
+        self.messages = message_box # Message box to give information. 
         self.gameover = False
+        self.messages.set("Player X")
 
     def newGame(self):
         '''Returns game to beginning.
@@ -155,6 +163,7 @@ class game(TTT):
         Post: self.board and self.turn are reset.'''
         self.board = [[".",".","."],[".",".","."],[".",".","."]] # creates an representation of an empty tictactoe board.
         self.turn = "X" # First turn is always starts with "X"
+        self.messages.set("Player X")
         self.numberofturns = 0 # Resets turn accumulator.
         self.gameover = False
             
@@ -301,12 +310,15 @@ class game(TTT):
                 Win = self.checkwin() # Checking for win.
                 if self.turn == "X": # Changes turns.
                     self.turn = "O"
+                    self.messages.set("Player O")
                 else:
                     self.turn = "X"
+                    self.messages.set("Player X")
                 if Win[0] == True: # If someone has won.
                     self.gameover = True
                     Message = str(Win[1]) + " wins!"
                     print(Message)
+                    self.messages.set(Message)
                     tkMessageBox.showinfo("Winner", Message) # Winning Message is displayed.
                 elif self.numberofturns == 8: 
                     tkMessageBox.showinfo("Tie", "Cat") # In case of Tie.
