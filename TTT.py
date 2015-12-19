@@ -18,6 +18,8 @@ class TTT(object):
         self.themenu = Menu(master)
         self.file_label_menu = Menu(self.themenu, tearoff=0)
         self.file_label_menu.add_command(label="New",command = self.new)
+        self.file_label_menu.add_separator()
+        self.file_label_menu.add_command(label="Exit",command=master.quit)
         self.themenu.add_cascade(label="File",menu=self.file_label_menu)
         master.config(menu=self.themenu)
         # Frames used in window.
@@ -155,7 +157,7 @@ class game(TTT):
         self.turtle = t # The turtle used to draw the shapes.
         self.messages = message_box # Message box to give information. 
         self.gameover = False
-        self.messages.set("Player X")
+        self.messages.set("Player: X")
 
     def newGame(self):
         '''Returns game to beginning.
@@ -163,7 +165,7 @@ class game(TTT):
         Post: self.board and self.turn are reset.'''
         self.board = [[".",".","."],[".",".","."],[".",".","."]] # creates an representation of an empty tictactoe board.
         self.turn = "X" # First turn is always starts with "X"
-        self.messages.set("Player X")
+        self.messages.set("Player: X")
         self.numberofturns = 0 # Resets turn accumulator.
         self.gameover = False
             
@@ -310,10 +312,9 @@ class game(TTT):
                 Win = self.checkwin() # Checking for win.
                 if self.turn == "X": # Changes turns.
                     self.turn = "O"
-                    self.messages.set("Player O")
                 else:
                     self.turn = "X"
-                    self.messages.set("Player X")
+                self.messages.set(str("Player: " + self.turn))
                 if Win[0] == True: # If someone has won.
                     self.gameover = True
                     Message = str(Win[1]) + " wins!"
@@ -321,11 +322,14 @@ class game(TTT):
                     self.messages.set(Message)
                     tkMessageBox.showinfo("Winner", Message) # Winning Message is displayed.
                 elif self.numberofturns == 8: 
+                    self.messages.set("Cat")
                     tkMessageBox.showinfo("Tie", "Cat") # In case of Tie.
                 else:
                     self.numberofturns += 1
             else:
+                self.messages.set("Not a valid move.")
                 tkMessageBox.showinfo("Invalid", "Not a valid Move") # If occupied spot is clicked.
+                self.messages.set(str("Player: " + self.turn))
         else:
             print("The game is over, Hit New.")
         
