@@ -31,9 +31,10 @@ class TTT(object):
 	self.label_message = StringVar()
 	Label(buttonframe,textvariable=self.label_message).pack()
         # Rawturtle
-        self.canvas = Canvas(frame,width=300,height=300)
+        self.canvas = Canvas(frame,width=300,height=300,relief=SUNKEN)
+        self.canvas.configure(background='blue')
         self.canvas.grid()
-        self.canvas.pack(side=RIGHT,fill=BOTH,expand=True)
+        self.canvas.pack(side=TOP,fill=BOTH,expand=True)
         self.turtle = turtle.RawTurtle(self.canvas) # embedded turtle.
         self.turtle.speed(10000)
         self.s = turtle.TurtleScreen(self.canvas) # Turtle's screen.
@@ -58,6 +59,16 @@ class TTT(object):
         '''Draws the tictactow grid.
         Pre: uses class's turtle object.
         Post: draws lines on the turtle canvas by means of overlapping rectangles.'''
+        self.turtle.up()
+        self.turtle.goto(-150,150)
+        self.turtle.down()
+        self.turtle.fillcolor("gray")
+        self.turtle.begin_fill()
+        self.turtle.goto(-150,-150)
+        self.turtle.goto(150,-150)
+        self.turtle.goto(150,150)
+        self.turtle.goto(-150,150)
+        self.turtle.end_fill()
         self.turtle.up()
         self.turtle.goto(-150,50) # First Line
         self.turtle.down()
@@ -335,7 +346,6 @@ class game(TTT):
             Message = "The game is over, Hit New."
             print(Message)
             self.messages.set(Message)
-        
 
 root=Tk()
 root.wm_title("Python Tic Tac Toe")
