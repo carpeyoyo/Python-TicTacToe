@@ -31,19 +31,25 @@ class TTT(object):
 	self.label_message = StringVar()
 	Label(buttonframe,textvariable=self.label_message).pack()
         # Rawturtle
-        self.canvas = Canvas(frame,width=300,height=300,relief=SUNKEN)
+        self.canvas = Canvas(frame,width=400,height=400,relief=SUNKEN)
         self.canvas.configure(background='blue')
         self.canvas.grid()
         self.canvas.pack(side=TOP,fill=BOTH,expand=True)
         self.turtle = turtle.RawTurtle(self.canvas) # embedded turtle.
         self.turtle.speed(10000)
         self.s = turtle.TurtleScreen(self.canvas) # Turtle's screen.
+        # Setting up initial center of board
+        self.x_center = 0
+        self.y_center = 0
+        self.maximum = 400
         # Setting up response to clicks.
         self.s.onclick(self.WhichSquare)
         # Draws initial grid.
         self.creategrid()
         # Initializes Game.
         self.g = game(self.turtle,self.label_message)
+        # Binding expose to frame in case window is resized.
+        frame.bind("<Expose>",self.recreate_board)
 
     def new(self):
         '''Creates new game.
@@ -54,6 +60,13 @@ class TTT(object):
         self.turtle.speed(10000)
         self.creategrid()
         self.g.newGame()
+
+    def recreate_board(self,event):
+        ''' The current configuration of the board is redrawn, centered in the window
+        Pre: Event placeholder for tkinter bind, 
+        Post: Current Configuration of board will be drawn. '''
+        print "Exposed"
+        
 
     def creategrid(self):
         '''Draws the tictactow grid.
