@@ -66,7 +66,10 @@ class TTT(object):
         Pre: Event placeholder for tkinter bind, 
         Post: Current Configuration of board will be drawn. '''
         print "Exposed"
-        
+        width = self.turtle.window_width()
+        height = self.turtle.window_height()
+        message = str(width) + "," + str(height)
+        print message
 
     def creategrid(self):
         '''Draws the tictactow grid.
