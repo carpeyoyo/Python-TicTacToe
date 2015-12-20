@@ -26,15 +26,15 @@ class TTT(object):
         buttonframe = Frame(master)
         buttonframe.pack()
         frame = Frame(master)
-        frame.pack(side=RIGHT,fill=BOTH,expand=True)
+        frame.pack(side=TOP,fill=BOTH,expand=True)
 	# Label in button frame
 	self.label_message = StringVar()
-	Label(buttonframe,textvariable=self.label_message).pack()
+	Label(buttonframe,textvariable=self.label_message,font=("serif",18)).pack()
         # Rawturtle
         self.canvas = Canvas(frame,width=400,height=400,relief=SUNKEN)
-        self.canvas.configure(background='blue')
         self.canvas.grid()
-        self.canvas.pack(side=TOP,fill=BOTH,expand=True)
+        #self.canvas.pack(side=TOP,fill=BOTH,expand=True)
+        self.canvas.pack(side=TOP)
         self.turtle = turtle.RawTurtle(self.canvas) # embedded turtle.
         self.turtle.speed(10000)
         self.s = turtle.TurtleScreen(self.canvas) # Turtle's screen.
@@ -48,8 +48,6 @@ class TTT(object):
         self.creategrid()
         # Initializes Game.
         self.g = game(self.turtle,self.label_message)
-        # Binding expose to frame in case window is resized.
-        frame.bind("<Expose>",self.recreate_board)
 
     def new(self):
         '''Creates new game.
@@ -60,16 +58,6 @@ class TTT(object):
         self.turtle.speed(10000)
         self.creategrid()
         self.g.newGame()
-
-    def recreate_board(self,event):
-        ''' The current configuration of the board is redrawn, centered in the window
-        Pre: Event placeholder for tkinter bind, 
-        Post: Current Configuration of board will be drawn. '''
-        print "Exposed"
-        width = self.turtle.window_width()
-        height = self.turtle.window_height()
-        message = str(width) + "," + str(height)
-        print message
 
     def creategrid(self):
         '''Draws the tictactow grid.
@@ -148,7 +136,10 @@ class TTT(object):
         '''Determines which square has been clicked.
         Pre: x and y are the coordinates of the click.
         Post: initiates the takeTurn method from game class.'''
-        if y > 50: 
+        print str(x) + "," + str(y)
+        if (x > 150) or (x < -150) or (y > 150) or (y < -150):
+            coor = "out" # If click was out of bounds.
+        elif y > 50: 
             if x < -50:
                 coor = "00" # Top left square.
             elif x < 50:
@@ -169,6 +160,7 @@ class TTT(object):
                 coor = "21" # Bottom Middle square.
             elif x < 150:
                 coor = "22" # Bottom Right Square.
+        print coor
         self.g.takeTurn(coor) # Begins the turn in game class.
 
 ##############################
@@ -330,38 +322,39 @@ class game(TTT):
         '''Runs through steps to play tictactoe
         Pre: Players square choice in coor.
         Post: Changes self.turn to other players symbol.'''
-        y = int(coor[0]) # Coordinates in term of x,y.
-        x = int(coor[1])
-        Variable = self.validMove((y,x)) # True or False Variable depeding on valid move.
-        if self.gameover == False:
-            if Variable == True:
-                self.board[y][x] = self.turn # Placing piece on virtual board.
-                self.drawshape(coor,self.turn) # Drawing shape on turtle canvas.
-                Win = self.checkwin() # Checking for win.
-                if self.turn == "X": # Changes turns.
-                    self.turn = "O"
+        if coor != "out":
+            y = int(coor[0]) # Coordinates in term of x,y.
+            x = int(coor[1])
+            Variable = self.validMove((y,x)) # True or False Variable depeding on valid move.
+            if self.gameover == False:
+                if Variable == True:
+                    self.board[y][x] = self.turn # Placing piece on virtual board.
+                    self.drawshape(coor,self.turn) # Drawing shape on turtle canvas.
+                    Win = self.checkwin() # Checking for win.
+                    if self.turn == "X": # Changes turns.
+                        self.turn = "O"
+                    else:
+                        self.turn = "X"
+                    self.messages.set(str("Player: " + self.turn))
+                    if Win[0] == True: # If someone has won.
+                        self.gameover = True
+                        Message = str(Win[1]) + " wins!"
+                        print(Message)
+                        self.messages.set(Message)
+                        tkMessageBox.showinfo("Winner", Message) # Winning Message is displayed.
+                    elif self.numberofturns == 8: 
+                        self.messages.set("Cat")
+                        tkMessageBox.showinfo("Tie", "Cat") # In case of Tie.
+                    else:
+                        self.numberofturns += 1
                 else:
-                    self.turn = "X"
-                self.messages.set(str("Player: " + self.turn))
-                if Win[0] == True: # If someone has won.
-                    self.gameover = True
-                    Message = str(Win[1]) + " wins!"
-                    print(Message)
-                    self.messages.set(Message)
-                    tkMessageBox.showinfo("Winner", Message) # Winning Message is displayed.
-                elif self.numberofturns == 8: 
-                    self.messages.set("Cat")
-                    tkMessageBox.showinfo("Tie", "Cat") # In case of Tie.
-                else:
-                    self.numberofturns += 1
+                    self.messages.set("Not a valid move.")
+                    tkMessageBox.showinfo("Invalid", "Not a valid Move") # If occupied spot is clicked.
+                    self.messages.set(str("Player: " + self.turn))
             else:
-                self.messages.set("Not a valid move.")
-                tkMessageBox.showinfo("Invalid", "Not a valid Move") # If occupied spot is clicked.
-                self.messages.set(str("Player: " + self.turn))
-        else:
-            Message = "The game is over, Hit New."
-            print(Message)
-            self.messages.set(Message)
+                Message = "The game is over, Hit New."
+                print(Message)
+                self.messages.set(Message)
 
 root=Tk()
 root.wm_title("Python Tic Tac Toe")
