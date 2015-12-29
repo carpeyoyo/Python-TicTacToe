@@ -7,106 +7,96 @@ class game:
     """Contains all necessary variables and methods to play tictactoe alone."""
 
     def __init__(self):
-        '''Initializes Instance Variables.'''
-        self.board = [[".",".","."],[".",".","."],[".",".","."]] # creates an representation of an empty tictactoe board.
-        self.turn = "X" # First turn is always starts with "X"
-        self.numberofturns = 0 # In order to know when to end game in the case of a draw.
+        # Game Constructor
+        # Creates default board, turn, number of turns, gameover state, message, and winner
+        self.board = [".",".",".",".",".",".",".",".","."]
+        self.turn = "X"
+        self.turn_number = 0
+        self.message = "Player X to move."
         self.gameover = False
-	self.message = ""
-	self.shape = ""
 
-    def newGame(self):
-        '''Returns game to beginning.
-        Pre: None
-        Post: self.board and self.turn are reset.'''
-        self.board = [[".",".","."],[".",".","."],[".",".","."]] # creates an representation of an empty tictactoe board.
-        self.turn = "X" # First turn is always starts with "X"
-        self.numberofturns = 0 # Resets turn accumulator.
-        self.gameover = False
+    def CheckEnd(self):
+	    # Checks if game is over
+	    # Pre: Uses self.board and self.turn_number to decide if game is over
+        # Post: sets self.gameover to True is game is over, and sets self.message to end message
+
+        if self.turn > 4: # No reason to check otherwise
+        
+            # Checking those involving top left square
+            if self.board[0] != ".":
+                if (self.board[0] == self.board[1]) and (self.board[1] == self.board[2]): 
+                    self.gameover = True
+                    self.message = self.board[0] + " Wins!"
+                if (self.board[0] == self.board[3]) and (self.board[3] == self.board[6]): 
+                    self.gameover = True
+                    self.message = self.board[0] + " Wins!"
+                if (self.board[0] == self.board[4]) and (self.board[4] == self.board[8]): 
+                    self.gameover = True
+                    self.message = self.board[0] + " Wins!"
             
-    def validMove(self,move):
-        ''' Checks to see if an attempted move is possible.
-        Pre: The move in question.
-        Post: True or False answer depending on the Validity of the move.'''
-        (y,x) = move
+            # Checking those involving top right square
+            if self.board[2] != ".":
+                print "Here"
+                if (self.board[2] == self.board[4]) and (self.board[4] == self.board[6]): 
+                    self.gameover = True
+                    self.message = self.board[2] + " Wins!"
+                if (self.board[2] == self.board[5]) and (self.board[5] == self.board[8]): 
+                    self.gameover = True
+                    self.message = self.board[2] + " Wins!"
+    
+            # Checking those involving bottom middle square
+            if self.board[7] != ".":
+                if (self.board[7] == self.board[6]) and (self.board[6] == self.board[8]):
+                    self.gameover = True
+                    self.message = self.board[7] + " Wins!"
+                if (self.board[7] == self.board[1]) and (self.board[1] == self.board[4]):
+                    self.gameover = True
+                    self.message = self.board[7] + " Wins!"
+    
+            # Checking across middle
+            if self.board[3] != ".":
+                if (self.board[3] == self.board[4]) and (self.board[4] == self.board[5]):
+                    self.gameover = True
+                    self.message = self.board[3] + " Wins!"
+    
+            # Checking if tie
+            if self.gameover == False:
+                if self.turn_number == 9:
+                    self.gameover = True
+                    self.message = "Tie"
+    
+    def ValidMove(self,coor):
+        # Finds if move is valid
+        # Pre: Uses self.board and the coor following the board numbers that can be found in board_numbers
+        # Post: Returns true if move can be made, false otherwise
         answer = False
-        if self.board[y][x] == ".":
-            answer = True
+        if self.gameover == False:
+            if self.board[coor] == ".":
+                answer = True
         return answer
 
-    def checkwin(self):
-        """Checks all possibilities for a possible win.
-        Pre: Uses self.board
-        Post: Returns a list containing True or False in index one and winning 
-        symbol if it applies in index two"""
-        Answer = []
-        # Horizontal Rows.
-        if self.board[0][0] == self.board[0][1] and self.board[0][1] == self.board[0][2]: # Top
-            if self.board[0][0] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][0])
-        elif self.board[1][0] == self.board[1][1] and self.board[1][1] ==self.board[1][2]: # Middle
-            if self.board[1][0] != ".":
-                Answer.append(True)
-                Answer.append(self.board[1][0])
-        elif self.board[2][0] == self.board[2][1] and self.board[2][1] == self.board[2][2]: # Bottom
-            if self.board[2][0] != ".":
-                Answer.append(True)
-                Answer.append(self.board[2][0])
-        # Vertical Column Possibilities
-        elif self.board[0][0] == self.board[1][0] and self.board[1][0] == self.board[2][0]: # Left
-            if self.board[0][0] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][0])
-        elif self.board[0][1] == self.board[1][1] and self.board[1][1] == self.board[2][1]: # Middle
-            if self.board[0][1] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][1])
-        elif self.board[0][2] == self.board[1][2] and self.board[1][2] == self.board[2][2]: # Right
-            if self.board[0][2] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][2])
-        # Across Possibilites
-        elif self.board[0][0] == self.board[1][1] and self.board[1][1] == self.board[2][2]: # Top
-            if self.board[0][0] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][0])
-        elif self.board[0][2] == self.board[1][1] and self.board[1][1] == self.board[2][0]: # Bottom
-            if self.board[0][2] != ".":
-                Answer.append(True)
-                Answer.append(self.board[0][2])
-        if len(Answer) == 0:
-            Answer.append(False)
-        return Answer
-
-    def takeTurn(self,coor):
-        '''Runs through steps to play tictactoe
-        Pre: Players square choice in coor.
-        Post: Changes self.turn to other players symbol.'''
-        if coor != "out":
-            y = int(coor[0]) # Coordinates in term of x,y.
-            x = int(coor[1])
-            Variable = self.validMove((y,x)) # True or False Variable depeding on valid move.
-            if self.gameover == False:
-                if Variable == True:
-                    self.board[y][x] = self.turn # Placing piece on virtual board.
-                    Win = self.checkwin() # Checking for win.
-                    if self.turn == "X": # Changes turns.
-                        self.turn = "O"
-                    else:
-                        self.turn = "X"
-                    if Win[0] == True: # If someone has won.
-                        self.gameover = True
-                        Message = str(Win[1]) + " wins!"
-                        print(Message)
-                        print("Winner", Message) # Winning Message is displayed.
-                    elif self.numberofturns == 8: 
-                        print("Tie", "Cat") # In case of Tie.
-                    else:
-                        self.numberofturns += 1
+    def TakeTurn(self,coor):
+        # Makes move if possible
+        # Pre: Uses self.board and input coordinate
+        # Post: Returns true if move was made
+        answer = False
+        if self.gameover == False:
+            answer = self.ValidMove(coor)
+            if answer == True: 
+                # Piece can be placed
+                self.board[coor] = self.turn
+                self.turn_number += 1
+                # Switching Pieces
+                if self.turn == "X":
+                    self.turn = "O"
                 else:
-                    self.message = "Not a valid Move. " + self.turn + " to move." # If occupied spot is clicked.
+                    self.turn = "X"
+                # Creating message
+                self.message = "Player " + self.turn + " to move"
             else:
-                Message = "The game is over, Hit New."
-                print(Message)
-
+                # Creating message for invalid move
+                self.message = "Invalid move. Player " + self.turn + " to move"
+        else:
+            # Creating message if game is already over
+            self.message = "Game is over. Start a new game."
+        return answer
