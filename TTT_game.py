@@ -8,6 +8,11 @@ class game:
 
     def __init__(self):
         # Game Constructor
+        # New game method is called
+        self.newGame()
+
+    def newGame(self):
+        # Sets game variables to default
         # Creates default board, turn, number of turns, gameover state, message, and winner
         self.board = [".",".",".",".",".",".",".",".","."]
         self.turn = "X"
@@ -20,7 +25,7 @@ class game:
 	    # Pre: Uses self.board and self.turn_number to decide if game is over
         # Post: sets self.gameover to True is game is over, and sets self.message to end message
 
-        if self.turn > 4: # No reason to check otherwise
+        if self.turn_number > 4: # No reason to check otherwise
         
             # Checking those involving top left square
             if self.board[0] != ".":
@@ -36,7 +41,6 @@ class game:
             
             # Checking those involving top right square
             if self.board[2] != ".":
-                print "Here"
                 if (self.board[2] == self.board[4]) and (self.board[4] == self.board[6]): 
                     self.gameover = True
                     self.message = self.board[2] + " Wins!"
@@ -61,7 +65,7 @@ class game:
     
             # Checking if tie
             if self.gameover == False:
-                if self.turn_number == 9:
+                if self.turn_number > 8:
                     self.gameover = True
                     self.message = "Tie"
     
@@ -70,9 +74,8 @@ class game:
         # Pre: Uses self.board and the coor following the board numbers that can be found in board_numbers
         # Post: Returns true if move can be made, false otherwise
         answer = False
-        if self.gameover == False:
-            if self.board[coor] == ".":
-                answer = True
+        if self.board[coor] == ".":
+            answer = True
         return answer
 
     def TakeTurn(self,coor):
@@ -96,7 +99,4 @@ class game:
             else:
                 # Creating message for invalid move
                 self.message = "Invalid move. Player " + self.turn + " to move"
-        else:
-            # Creating message if game is already over
-            self.message = "Game is over. Start a new game."
         return answer

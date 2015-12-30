@@ -26,9 +26,9 @@ class TTT(object):
         buttonframe.pack()
         frame = Frame(master)
         frame.pack(side=TOP,fill=BOTH,expand=True)
-	# Label in button frame
-	self.label_message = StringVar()
-	Label(buttonframe,textvariable=self.label_message,font=("serif",18)).pack()
+        # Label in button frame
+        self.label_message = StringVar()
+        Label(buttonframe,textvariable=self.label_message,font=("serif",18)).pack()
         # Rawturtle
         self.canvas = Canvas(frame,width=400,height=400,relief=SUNKEN)
         self.canvas.grid()
@@ -47,6 +47,7 @@ class TTT(object):
         self.creategrid()
         # Initializes Game.
         self.g = game()
+        self.label_message.set(self.g.message)
 
     def new(self):
         '''Creates new game.
@@ -135,32 +136,42 @@ class TTT(object):
         '''Determines which square has been clicked.
         Pre: x and y are the coordinates of the click.
         Post: initiates the takeTurn method from game class.'''
-        print str(x) + "," + str(y)
+        # Checking which square was clicked
         if (x > 150) or (x < -150) or (y > 150) or (y < -150):
             coor = "out" # If click was out of bounds.
         elif y > 50: 
             if x < -50:
-                coor = "00" # Top left square.
+                coor = 0 # Top left square.
             elif x < 50:
-                coor = "01" # Top middle square.
+                coor =  1 # Top middle square.
             elif x < 150:
-                coor = "02" # Top Right square.
+                coor = 2 # Top Right square.
         elif y > -50:
             if x < -50:
-                coor = "10" # Middle left square.
+                coor = 3 # Middle left square.
             elif x < 50:
-                coor = "11" # Center Square.
+                coor = 4 # Center Square.
             elif x < 150:
-                coor = "12" # Middle rigth square.
+                coor = 5 # Middle rigth square.
         elif y > -150:
             if x < -50:
-                coor = "20" # Bottom left square.
+                coor = 6 # Bottom left square.
             elif x < 50:
-                coor = "21" # Bottom Middle square.
+                coor = 7 # Bottom Middle square.
             elif x < 150:
-                coor = "22" # Bottom Right Square.
-        print coor
-        self.g.takeTurn(coor) # Begins the turn in game class.
+                coor = 8 # Bottom Right Square.
+        # Entering move in game
+        if coor != "out":
+            if self.g.gameover == False:
+                current_sym = self.g.turn
+                if (self.g.TakeTurn(coor)): # Begins the turn in game class.
+                    self.drawshape(coor,current_sym) # Draws shape if valid move
+                    self.g.CheckEnd() # Checks to see if game is over
+                    self.label_message.set(self.g.message)
+                else: # Invalid Move
+                    self.label_message.set(self.g.message)
+            else:
+                self.label_message.set("The game is over. Start a new game.")
 
     def circle(self,center):
         '''Creates Circle on Board.
@@ -213,23 +224,23 @@ class TTT(object):
         self.turtle.up()
 
     def drawshape(self,coor,Turn):
-        if coor == "00":            # Top Left
+        if coor == 0:            # Top Left
             center = (-100,100)
-        elif coor == "01":          # Top Middle
+        elif coor == 1:          # Top Middle
             center = (0,100)
-        elif coor == "02":          # Top Right
+        elif coor == 2:          # Top Right
             center = (100,100)
-        elif coor == "10":          # Middle Left
+        elif coor == 3:          # Middle Left
             center = (-100,0)
-        elif coor == "11":          # Center
+        elif coor == 4:          # Center
             center = (0,0)
-        elif coor == "12":          # Middle Right
+        elif coor == 5:          # Middle Right
             center = (100,0)
-        elif coor == "20":          # Bottom Left
+        elif coor == 6:          # Bottom Left
             center = (-100,-100)
-        elif coor == "21":          # Bottom Middle
+        elif coor == 7:          # Bottom Middle
             center = (0,-100)
-        elif coor == "22":          # Bottom Right
+        elif coor == 8:          # Bottom Right
             center = (100,-100)
         if Turn == "O":             # Deciding Between Circle and square.
             self.circle(center)
