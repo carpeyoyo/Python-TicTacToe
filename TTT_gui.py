@@ -53,11 +53,13 @@ class TTT(object):
         '''Creates new game.
         Pre: None
         Post: resets the turtle, draws new grid, and initiates new grid class.'''
+        self.label_message.set("")
         self.canvas.delete("all")
         self.turtle.reset()
         self.turtle.speed(10000)
         self.creategrid()
         self.g.newGame()
+        self.label_message.set(self.g.message)
 
     def creategrid(self):
         '''Draws the tictactow grid.
