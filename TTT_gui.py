@@ -4,6 +4,14 @@ from Tkinter import *
 import turtle
 from TTT_game import *
 
+def print_board(board):
+    # Prints out the current board setting
+    for i in range(0,3,1):
+        string = ""
+        for j in range(0,3,1):
+            string += board[((i*3)+j)]
+        print string
+
 #####################
 """The Class to Create an App."""
 
@@ -64,6 +72,8 @@ class TTT(object):
             self.height = self.width
         self.canvas.delete(ALL)
         self.creategrid()
+        if (self.g.turn_number > 0):
+            self.place_pieces()
 
     def creategrid(self):
         '''Draws the tictactow grid.
@@ -80,6 +90,15 @@ class TTT(object):
         self.canvas.create_line(0,self.height/3,self.width,self.height/3,width=4.0)
         # Line 4
         self.canvas.create_line(0,2*self.height/3,self.width,2*self.height/3,width=4.0)
+
+    def place_pieces(self):
+        '''Draws the pieces on the board when necessary.
+        Pre: Uses class's canvas and game objects.
+        Post: Current pieces in game are are board. '''
+        for i in range(0,9,1):
+            piece = self.g.board[i]
+            if piece != ".":
+                self.drawshape(i,piece)
 
     def WhichSquare(self,event):
         '''Determines which square has been clicked.
@@ -123,8 +142,8 @@ class TTT(object):
                     coor = 8 # Bottom Right Square.
         print str(x) + "," + str(y)
         print "Coordinate: " + str(coor)
+        
         # Entering move in game
-        '''
         if coor != "out":
             if self.g.gameover == False:
                 current_sym = self.g.turn
@@ -132,47 +151,78 @@ class TTT(object):
                     self.drawshape(coor,current_sym) # Draws shape if valid move
                     self.g.CheckEnd() # Checks to see if game is over
                     self.label_message.set(self.g.message)
+                    print_board(self.g.board)
                 else: # Invalid Move
                     self.label_message.set(self.g.message)
             else:
-                self.label_message.set("The game is over. Start a new game.")
-        '''
+                self.label_message.set("Game Over, Hit New")
 
-    def circle(self,center):
+    def shape_coordinates(self,x,y):
+        '''Finds the coordinates for either a circle or cross
+        Pre: The center x,y as arguments, also uses current value of self.width.
+        Post: The box coordinates are returned as a tuple.'''
+        # Finding coordinates
+        temp = self.width / 8 # half the length of a side
+        x0 = x - temp
+        y0 = y - temp
+        x1 = x + temp
+        y1 = y + temp
+        return (x0,y0,x1,y1)
+
+    def circle(self,x,y):
         '''Creates Circle on Board.
         Pre: Center of symbol.
         Post: Draws an O on the board at the center coordinate given.'''
-        (x,y) = center
-        pass
+        # Retrieving coordinates
+        (x0,y0,x1,y1) = self.shape_coordinates(x,y)
+        # Creating circle
+        self.canvas.create_oval(x0,y0,x1,y1,outline="green",width=4.0)
 
-    def cross(self,center):
+    def cross(self,x,y):
         '''Creates Cross on board.
         Pre: Center is middle position of "X" on board.
         Post: Draws an X on the board at the center coordinate given'''
-        (x,y) = center
-        pass
+        # Retrieving coordinates
+        (x0,y0,x1,y1) = self.shape_coordinates(x,y)
+        # Creating lines
+        self.canvas.create_line(x0,y0,x1,y1,fill="red",width=4.0)
+        self.canvas.create_line(x0,y1,x1,y0,fill="red",width=4.0)
 
     def drawshape(self,coor,Turn):
+        x = None
+        y = None
         if coor == 0:            # Top Left
-            center = (-100,100)
+            x = self.width/6
+            y = self.height/6
         elif coor == 1:          # Top Middle
-            center = (0,100)
+            x = self.width/2
+            y = self.height/6
         elif coor == 2:          # Top Right
-            center = (100,100)
+            x = (5*self.width)/6
+            y = self.height/6
         elif coor == 3:          # Middle Left
-            center = (-100,0)
+            x = self.width/6
+            y = self.width/2         
         elif coor == 4:          # Center
-            center = (0,0)
+            x = self.width/2
+            y = self.width/2
         elif coor == 5:          # Middle Right
-            center = (100,0)
+            x = (5*self.width)/6
+            y = self.width/2
         elif coor == 6:          # Bottom Left
-            center = (-100,-100)
+            x = self.width/6
+            y = (5*self.width)/6
         elif coor == 7:          # Bottom Middle
-            center = (0,-100)
+            x = self.width/2
+            y = (5*self.width)/6
         elif coor == 8:          # Bottom Right
-            center = (100,-100)
-        if Turn == "O":             # Deciding Between Circle and square.
-            self.circle(center)
-        else:
-            self.cross(center)
+            x = (5*self.width)/6
+            y = (5*self.width)/6
+            
+        # Deciding Between Circle and square.
+        if (x != None) and (y != None):
+            if Turn == "O":      
+                self.circle(x,y)
+            else:
+                self.cross(x,y)
 
