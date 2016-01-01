@@ -81,7 +81,7 @@ class TTT(object):
         Pre: uses class's canvas object.
         Post: draws lines on the canvas.'''
         ## Drawling Background
-        self.canvas.create_rectangle(self.x_offset,self.y_offset,self.x_offset+self.width,self.y_offset+self.height,fill="grey")
+        self.canvas.create_rectangle(self.x_offset,self.y_offset,self.x_offset+self.width,self.y_offset+self.height,fill="#C0C0C0")
         ## Drawling Lines
         length = self.width / 3
         # Line 1
@@ -182,50 +182,50 @@ class TTT(object):
             y0 = self.y_offset + (self.height)/6
             x1 = self.x_offset + (5*self.width)/6
             y1 = self.y_offset + (5*self.height)/6
-            self.canvas.create_arc(x0,y0,x1,y1,style=ARC,width=8.0,start=30.0,extent=300.0)
+            self.canvas.create_arc(x0,y0,x1,y1,style=ARC,width=8.0,start=30.0,extent=300.0,dash=(16,8),outline="#009ACD")
         else:
             if self.g.end_symbol == 0: # Across top
-                x0 = self.x_offset + self.width/6
+                x0 = self.x_offset + self.width/12
                 y0 = self.y_offset + self.height/6
-                x1 = self.x_offset + (5*self.width)/6
+                x1 = self.x_offset + (11*self.width)/12
                 y1 = y0
             elif self.g.end_symbol == 1: # Down left
                 x0 = self.x_offset + self.width/6
-                y0 = self.y_offset + self.height/6
+                y0 = self.y_offset + self.height/12
                 x1 = x0
-                y1 = self.y_offset + (5*self.height)/6
+                y1 = self.y_offset + (11*self.height)/12
             elif self.g.end_symbol == 2: # Diagonal from top left
-                x0 = self.x_offset + self.width/6
-                y0 = self.y_offset + self.height/6
-                x1 = self.x_offset + (5*self.width)/6
-                y1 = self.y_offset + (5*self.height)/6
+                x0 = self.x_offset + self.width/12
+                y0 = self.y_offset + self.height/12
+                x1 = self.x_offset + (11*self.width)/12
+                y1 = self.y_offset + (11*self.height)/12
             elif self.g.end_symbol == 3: # Diagonal from bottom left
-                x0 = self.x_offset + self.width/6
-                y0 = self.y_offset + (5*self.height)/6
-                x1 = self.x_offset + (5*self.width)/6
-                y1 = self.y_offset + self.height/6
+                x0 = self.x_offset + self.width/12
+                y0 = self.y_offset + (11*self.height)/12
+                x1 = self.x_offset + (11*self.width)/12
+                y1 = self.y_offset + self.height/12
             elif self.g.end_symbol == 4: # Down right
                 x0 = self.x_offset + (5*self.width)/6
-                y0 = self.y_offset + self.height/6
+                y0 = self.y_offset + self.height/12
                 x1 = x0
-                y1 = self.y_offset + (5*self.width)/6
+                y1 = self.y_offset + (11*self.width)/12
             elif self.g.end_symbol == 5: # Across bottom
-                x0 = self.x_offset + self.width/6
+                x0 = self.x_offset + self.width/12
                 y0 = self.y_offset + (5*self.height)/6
-                x1 = self.x_offset + (5*self.width)/6
+                x1 = self.x_offset + (11*self.width)/12
                 y1 = y0
             elif self.g.end_symbol == 6: # Down middle
                 x0 = self.x_offset + self.width/2
-                y0 = self.y_offset + self.height/6
+                y0 = self.y_offset + self.height/12
                 x1 = x0
-                y1 = self.y_offset + (5*self.height)/6
+                y1 = self.y_offset + (11*self.height)/12
             elif self.g.end_symbol == 7: # Across middle
-                x0 = self.x_offset + self.width/6
+                x0 = self.x_offset + self.width/12
                 y0 = self.y_offset + self.height/2
-                x1 = self.x_offset + (5*self.width)/6
+                x1 = self.x_offset + (11*self.width)/12
                 y1 = y0
             # Drawing the line over the winner
-            self.canvas.create_line(x0,y0,x1,y1,width=8.0)
+            self.canvas.create_line(x0,y0,x1,y1,width=8.0,dash=(16,8),fill="#009ACD")
 
     def shape_coordinates(self,x,y):
         '''Finds the coordinates for either a circle or cross
@@ -246,7 +246,7 @@ class TTT(object):
         # Retrieving coordinates
         (x0,y0,x1,y1) = self.shape_coordinates(x,y)
         # Creating circle
-        self.canvas.create_oval(x0,y0,x1,y1,outline="green",width=4.0)
+        self.canvas.create_oval(x0,y0,x1,y1,outline="#33DD00",width=4.0)
 
     def cross(self,x,y):
         '''Creates Cross on board.
@@ -255,8 +255,8 @@ class TTT(object):
         # Retrieving coordinates
         (x0,y0,x1,y1) = self.shape_coordinates(x,y)
         # Creating lines
-        self.canvas.create_line(x0,y0,x1,y1,fill="red",width=4.0)
-        self.canvas.create_line(x0,y1,x1,y0,fill="red",width=4.0)
+        self.canvas.create_line(x0,y0,x1,y1,fill="#FF3300",width=4.0)
+        self.canvas.create_line(x0,y1,x1,y0,fill="#FF3300",width=4.0)
 
     def drawshape(self,coor,Turn):
         x = None
