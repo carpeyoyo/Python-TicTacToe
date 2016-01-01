@@ -73,6 +73,8 @@ class TTT(object):
         self.creategrid()
         if (self.g.turn_number > 0):
             self.place_pieces()
+        if (self.g.gameover == True):
+            self.draw_end_symbol()
 
     def creategrid(self):
         '''Draws the tictactow grid.
@@ -176,7 +178,11 @@ class TTT(object):
         Pre: Uses the game class end_symbol variable.
         Post: Symbol is drawn. '''
         if self.g.end_symbol == -1: # Tie
-            pass
+            x0 = self.x_offset + self.width/6
+            y0 = self.y_offset + (self.height)/6
+            x1 = self.x_offset + (5*self.width)/6
+            y1 = self.y_offset + (5*self.height)/6
+            self.canvas.create_arc(x0,y0,x1,y1,style=ARC,width=8.0,start=30.0,extent=300.0)
         else:
             if self.g.end_symbol == 0: # Across top
                 x0 = self.x_offset + self.width/6
