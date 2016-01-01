@@ -19,6 +19,7 @@ class game:
         self.turn_number = 0
         self.message = "Player X to move."
         self.gameover = False
+        self.end_symbol = -1
 
     def CheckEnd(self):
 	    # Checks if game is over
@@ -29,40 +30,44 @@ class game:
         
             # Checking those involving top left square
             if self.board[0] != ".":
-                if (self.board[0] == self.board[1]) and (self.board[1] == self.board[2]): 
+                if (self.board[0] == self.board[1]) and (self.board[1] == self.board[2]): # Across Top
                     self.gameover = True
                     self.message = self.board[0] + " Wins!"
-                if (self.board[0] == self.board[3]) and (self.board[3] == self.board[6]): 
+                    self.end_symbol = 0
+                if (self.board[0] == self.board[3]) and (self.board[3] == self.board[6]): # Down Left
                     self.gameover = True
                     self.message = self.board[0] + " Wins!"
-                if (self.board[0] == self.board[4]) and (self.board[4] == self.board[8]): 
+                    self.end_symbol = 1
+                if (self.board[0] == self.board[4]) and (self.board[4] == self.board[8]): # Diagonal from top left
                     self.gameover = True
                     self.message = self.board[0] + " Wins!"
-            
+                    self.end_symbol = 2
             # Checking those involving top right square
             if self.board[2] != ".":
-                if (self.board[2] == self.board[4]) and (self.board[4] == self.board[6]): 
+                if (self.board[2] == self.board[4]) and (self.board[4] == self.board[6]): # Diagonal from bottom left
                     self.gameover = True
                     self.message = self.board[2] + " Wins!"
-                if (self.board[2] == self.board[5]) and (self.board[5] == self.board[8]): 
+                    self.end_symbol = 3
+                if (self.board[2] == self.board[5]) and (self.board[5] == self.board[8]): # Down right
                     self.gameover = True
                     self.message = self.board[2] + " Wins!"
-    
+                    self.end_symbol = 4
             # Checking those involving bottom middle square
             if self.board[7] != ".":
-                if (self.board[7] == self.board[6]) and (self.board[6] == self.board[8]):
+                if (self.board[7] == self.board[6]) and (self.board[6] == self.board[8]): # Across Bottom
                     self.gameover = True
                     self.message = self.board[7] + " Wins!"
-                if (self.board[7] == self.board[1]) and (self.board[1] == self.board[4]):
+                    self.end_symbol = 5
+                if (self.board[7] == self.board[1]) and (self.board[1] == self.board[4]): # Down middle
                     self.gameover = True
                     self.message = self.board[7] + " Wins!"
-    
+                    self.end_symbol = 6
             # Checking across middle
             if self.board[3] != ".":
-                if (self.board[3] == self.board[4]) and (self.board[4] == self.board[5]):
+                if (self.board[3] == self.board[4]) and (self.board[4] == self.board[5]): # Across middle
                     self.gameover = True
                     self.message = self.board[3] + " Wins!"
-    
+                    self.end_symbol = 7
             # Checking if tie
             if self.gameover == False:
                 if self.turn_number > 8:

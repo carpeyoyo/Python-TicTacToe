@@ -1,7 +1,6 @@
 # Joshua Mazur
 
 from Tkinter import * 
-import turtle
 from TTT_game import *
 
 #####################
@@ -28,7 +27,7 @@ class TTT(object):
         frame.pack(side=TOP,fill=BOTH,expand=True)
         # Label in button frame
         self.label_message = StringVar()
-        Label(buttonframe,textvariable=self.label_message,font=("serif",18)).pack()
+        Label(buttonframe,textvariable=self.label_message,font=("serif",16)).pack()
         # Canvas for drawing
         self.width = 400
         self.height = 400
@@ -126,15 +125,14 @@ class TTT(object):
         x = event.x
         y = event.y
         coor = "out"
-        first_x = self.width/3
-        second_x = (2*self.width)/3
-        third_x = self.width
-        first_y = self.height/3
-        second_y = (2*self.height)/3
-        third_y = self.height
-
+        first_x = self.x_offset + self.width/3
+        second_x = self.x_offset + (2*self.width)/3
+        third_x = self.x_offset + self.width
+        first_y = self.y_offset + self.height/3
+        second_y = self.y_offset + (2*self.height)/3
+        third_y = self.y_offset + self.height
         # Determing square by coordinates
-        if (x > 0) and (y > 0):
+        if (x > self.x_offset) and (y > self.y_offset):
             if y < first_y:
                 if x < first_x:
                     coor = 0 # Top left square.
@@ -156,8 +154,6 @@ class TTT(object):
                     coor = 7 # Bottom Middle square.
                 elif x < third_x:
                     coor = 8 # Bottom Right Square.
-        print str(x) + "," + str(y)
-        print "Coordinate: " + str(coor)
         
         # Entering move in game
         if coor != "out":
@@ -167,10 +163,63 @@ class TTT(object):
                     self.drawshape(coor,current_sym) # Draws shape if valid move
                     self.g.CheckEnd() # Checks to see if game is over
                     self.label_message.set(self.g.message)
+                    # Checking whether to draw winning symbol
+                    if self.g.gameover == True:
+                        self.draw_end_symbol()
                 else: # Invalid Move
                     self.label_message.set(self.g.message)
             else:
                 self.label_message.set("Game Over, Hit New")
+
+    def draw_end_symbol(self):
+        '''Draws the symbol incidicating a window.
+        Pre: Uses the game class end_symbol variable.
+        Post: Symbol is drawn. '''
+        if self.g.end_symbol == -1: # Tie
+            pass
+        else:
+            if self.g.end_symbol == 0: # Across top
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + self.height/6
+                x1 = self.x_offset + (5*self.width)/6
+                y1 = y0
+            elif self.g.end_symbol == 1: # Down left
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + self.height/6
+                x1 = x0
+                y1 = self.y_offset + (5*self.height)/6
+            elif self.g.end_symbol == 2: # Diagonal from top left
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + self.height/6
+                x1 = self.x_offset + (5*self.width)/6
+                y1 = self.y_offset + (5*self.height)/6
+            elif self.g.end_symbol == 3: # Diagonal from bottom left
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + (5*self.height)/6
+                x1 = self.x_offset + (5*self.width)/6
+                y1 = self.y_offset + self.height/6
+            elif self.g.end_symbol == 4: # Down right
+                x0 = self.x_offset + (5*self.width)/6
+                y0 = self.y_offset + self.height/6
+                x1 = x0
+                y1 = self.y_offset + (5*self.width)/6
+            elif self.g.end_symbol == 5: # Across bottom
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + (5*self.height)/6
+                x1 = self.x_offset + (5*self.width)/6
+                y1 = y0
+            elif self.g.end_symbol == 6: # Down middle
+                x0 = self.x_offset + self.width/2
+                y0 = self.y_offset + self.height/6
+                x1 = x0
+                y1 = self.y_offset + (5*self.height)/6
+            elif self.g.end_symbol == 7: # Across middle
+                x0 = self.x_offset + self.width/6
+                y0 = self.y_offset + self.height/2
+                x1 = self.x_offset + (5*self.width)/6
+                y1 = y0
+            # Drawing the line over the winner
+            self.canvas.create_line(x0,y0,x1,y1,width=8.0)
 
     def shape_coordinates(self,x,y):
         '''Finds the coordinates for either a circle or cross
