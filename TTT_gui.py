@@ -4,14 +4,6 @@ from Tkinter import *
 import turtle
 from TTT_game import *
 
-def print_board(board):
-    # Prints out the current board setting
-    for i in range(0,3,1):
-        string = ""
-        for j in range(0,3,1):
-            string += board[((i*3)+j)]
-        print string
-
 #####################
 """The Class to Create an App."""
 
@@ -40,6 +32,8 @@ class TTT(object):
         # Canvas for drawing
         self.width = 400
         self.height = 400
+        self.x_offset = 0
+        self.y_offset = 0
         self.canvas = Canvas(frame,width=self.width,height=self.height,relief=SUNKEN)
         self.canvas.grid()
         self.canvas.pack(side=TOP,fill=BOTH,expand=True)
@@ -64,12 +58,18 @@ class TTT(object):
         '''Draws the tic tac toe board.
         Pre: The event passed to the widget, when board needs redrawn.
         Post: Board is drawn on window.'''
+        # Adjusting values
         self.width = event.width
         self.height = event.height
-        if self.width > self.height:
+        if self.width > self.height: # Keeping square
+            self.x_offset = (self.width - self.height) / 2
+            self.y_offset = 0
             self.width = self.height
         else:
+            self.y_offset = (self.height - self.width) / 2
+            self.x_offset = 0
             self.height = self.width
+        # Redrawing 
         self.canvas.delete(ALL)
         self.creategrid()
         if (self.g.turn_number > 0):
@@ -80,16 +80,33 @@ class TTT(object):
         Pre: uses class's canvas object.
         Post: draws lines on the canvas.'''
         ## Drawling Background
-        self.canvas.create_rectangle(0,0,self.width,self.height,fill="grey")
+        self.canvas.create_rectangle(self.x_offset,self.y_offset,self.x_offset+self.width,self.y_offset+self.height,fill="grey")
         ## Drawling Lines
+        length = self.width / 3
         # Line 1
-        self.canvas.create_line(self.width/3,0,self.width/3,self.height,width=4.0)
+        x0 = length + self.x_offset
+        y0 = self.y_offset
+        x1 = x0
+        y1 = self.y_offset + self.height
+        self.canvas.create_line(x0,y0,x1,y1,width=4.0)
         # Line 2
-        self.canvas.create_line(2*self.width/3,0,2*self.width/3,self.height,width=4.0)
+        x0 = 2*length + self.x_offset
+        y0 = self.y_offset
+        x1 = x0
+        y1 = self.y_offset + self.height
+        self.canvas.create_line(x0,y0,x1,y1,width=4.0)
         # Line 3
-        self.canvas.create_line(0,self.height/3,self.width,self.height/3,width=4.0)
+        x0 = self.x_offset
+        y0 = self.y_offset + length
+        x1 = self.x_offset + self.width
+        y1 = y0
+        self.canvas.create_line(x0,y0,x1,y1,width=4.0)
         # Line 4
-        self.canvas.create_line(0,2*self.height/3,self.width,2*self.height/3,width=4.0)
+        x0 = self.x_offset
+        y0 = self.y_offset + 2*length
+        x1 = self.x_offset + self.width
+        y1 = y0
+        self.canvas.create_line(x0,y0,x1,y1,width=4.0)
 
     def place_pieces(self):
         '''Draws the pieces on the board when necessary.
@@ -105,7 +122,6 @@ class TTT(object):
         Pre: x and y are the coordinates of the click.
         Post: initiates the takeTurn method from game class.'''
         ## Checking which square was clicked
-
         # Initial values
         x = event.x
         y = event.y
@@ -151,7 +167,6 @@ class TTT(object):
                     self.drawshape(coor,current_sym) # Draws shape if valid move
                     self.g.CheckEnd() # Checks to see if game is over
                     self.label_message.set(self.g.message)
-                    print_board(self.g.board)
                 else: # Invalid Move
                     self.label_message.set(self.g.message)
             else:
@@ -221,6 +236,8 @@ class TTT(object):
             
         # Deciding Between Circle and square.
         if (x != None) and (y != None):
+            x += self.x_offset
+            y += self.y_offset
             if Turn == "O":      
                 self.circle(x,y)
             else:
