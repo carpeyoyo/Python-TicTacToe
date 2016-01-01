@@ -72,7 +72,7 @@ class game:
             if self.gameover == False:
                 if self.turn_number > 8:
                     self.gameover = True
-                    self.message = "Tie"
+                    self.message = "Tie (Cat)"
     
     def ValidMove(self,coor):
         # Finds if move is valid
