@@ -21,7 +21,13 @@ def print_board(board):
 def main():
     board_numbers()
     g = game()
-    a = AI()
+
+    # Asking for AI game difficulity
+    difficulty_message = "Enter game difficulity (0 for easy, 1 for medium, 2 for hard): "
+    difficulty = int(raw_input(difficulty_message))
+    a = AI(difficulty)
+
+    # Game main loop
     while g.gameover == False:
         # Beginning Output
         print(g.message)
@@ -42,9 +48,9 @@ def main():
                         error_message = "AI gave bad coordinate: " + str(ai_move)
                         exit()
         
-    # End Message and goodbye        
-    print(g.message)
-    print(g.board)
+    # End Message and goodbye
+    print("\n"+g.message)
+    print_board(g.board)
     print("Goodbye")
 
 main()
