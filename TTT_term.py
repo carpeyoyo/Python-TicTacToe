@@ -41,7 +41,7 @@ def main():
             if (g.TakeTurn(coor)):
                 g.CheckEnd()
                 if g.gameover == False: # Continue AI move if game is not over
-                    ai_move = a.next_move(g.board)
+                    ai_move = a.next_move(g.board,g.turn)
                     if (g.TakeTurn(ai_move)): # Check move
                         g.CheckEnd() # Checking if AI made winning move or tie.
                     else:
