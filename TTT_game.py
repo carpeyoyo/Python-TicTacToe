@@ -1,4 +1,5 @@
 # Joshua Mazur
+# Actual game class
 
 ##############################
 '''The Game Class.'''

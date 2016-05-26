@@ -1,4 +1,5 @@
 # Joshua Mazur
+# GUI class
 
 from Tkinter import * 
 import TTT_game

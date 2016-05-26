@@ -1,5 +1,5 @@
 # Joshua Mazur
-# This file is for testing the Tic Tac Toe game class by playing it in the terminal
+# This file is for testing the Tic Tac Toe game and classes by playing it in the terminal
 
 import TTT_game
 import TTT_AI
