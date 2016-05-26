@@ -19,6 +19,7 @@ class AI:
             errormessage = "Error setting difficulty in AI constructor.\nDifficulty given: " + str(level) + ". Needs to be either 0, 1, or 2."
             print(errormessage)
             exit()
+        print("**********")
 
     def next_move(self, currentboard, currentpiece):
         # Returns the next move the AI wished to make on the board
@@ -90,9 +91,118 @@ class AI:
             ## First Move (randomly choose from favor list
             index = random.randrange(0,len(favor_list),1)
             answer = favor_list[index]
+            if answer == 4:
+                havecenter = True
+            else:
+                havecenter = False
             yield answer
-            # Need to fill in rest
+            
+            ## Second Move
+            if havecenter: # Starting with center
+                # Finding where they moved
+                for coor in [0,1,2,3,5,6,7,8]:
+                    if self.currentboard[coor] == opponentpiece:
+                        move = coor
+                        
+                if move % 2 == 0: # One of the corners
+                    # Go across from them
+                    if move == 0:
+                        lastmove = 8
+                    elif move == 2:
+                        lastmove = 6
+                    elif move == 6:
+                        lastmove = 2
+                    else:
+                        lastmove = 0
+                    yield lastmove
 
+                    ## Third Move
+                    # Check if block is necessary
+                    answer = self.check_block(self.leftlist,self.currentboard,opponentpiece)
+                    if answer != -1:
+                        yield answer
+                    # If block was not necessary, move in the only other spot they did not
+                    else:
+                        if lastmove == 8:
+                            if self.currentboard[5] == ".":
+                                yield 5
+                            elif self.currentboard[7] == ".":
+                                yield 7
+                        elif lastmove == 6:
+                            if self.currentboard[3] == ".":
+                                yield 3
+                            elif self.currentboard[7] == ".":
+                                yield 7
+                        elif lastmove == 2:
+                            if self.currentboard[5] == ".":
+                                yield 5
+                            elif self.currentboard[1] == ".":
+                                yield 1
+                        elif lastmove == 0:
+                            if self.currentboard[1] == ".":
+                                yield 1
+                            elif self.currentboard[3] == ".":
+                                yield 3
+
+                else: # Opponent did not choose corner
+                    # Choose corner across from them
+                    if move == 1:
+                        choicelist = [6,8]
+                    elif move == 5:
+                        choicelist = [0,6]
+                    elif move == 7:
+                        choicelist = [0,2]
+                    else:
+                        choicelist = [2,8]
+                    index = random.randrange(0,2,1)
+                    lastmove = choicelist[index]
+                    yield lastmove
+                
+            else: # Starting from a corner
+                # If opponent choose center choose across from them.
+                if self.currentboard[4] == opponentpiece:
+                    if answer == 0:
+                        lastmove = 8
+                    elif answer == 2:
+                        lastmove = 6
+                    elif answer == 8:
+                        lastmove = 0
+                    elif answer == 6:
+                        lastmove = 2
+                    yield lastmove 
+
+                else:
+                    # Claim center yourself
+                    yield 4
+
+                    ## Third Move
+                    # Check for win or block
+                    win_block_answer = self.check_block(self.leftlist,self.currentboard,opponentpiece)
+                    if win_block_answer != -1:
+                        yield win_block_answer
+                    else:
+                        if answer == 0:
+                            if self.currentboard[1] == ".":
+                                lastmove = 1
+                            else:
+                                lastmove = 3
+                        elif answer == 2:
+                            if self.currentboard[1] == ".":
+                                lastmove = 1
+                            else:
+                                lastmove = 5
+                        elif answer == 8:
+                            if self.currentboard[5] == ".":
+                                lastmove = 5
+                            else:
+                                lastmove = 7
+                        elif answer == 6:
+                            if self.currentboard[7] == ".":
+                                lastmove = 7
+                            else:
+                                lastmove = 3
+                        yield lastmove
+                
         # Other Player went first    
         else:
             ## First Move

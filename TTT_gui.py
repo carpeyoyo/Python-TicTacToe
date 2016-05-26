@@ -1,7 +1,8 @@
 # Joshua Mazur
 
 from Tkinter import * 
-from TTT_game import *
+import TTT_game
+import TTT_AI
 
 #####################
 """The Class to Create an App."""
@@ -12,10 +13,25 @@ class TTT(object):
         Pre: The Tkinter master is supplied.
         Post: Game and window initialized. '''
         self.turn = "O"
-        # Adding menu bar
+        ## Adding menu bar
         self.themenu = Menu(master)
         self.file_label_menu = Menu(self.themenu, tearoff=0)
-        self.file_label_menu.add_command(label="New",command = self.new)
+        # Submenu
+        self.file_new_submenu = Menu(self.file_label_menu)
+        self.file_new_submenu.add_command(label="Human vs. Human",command = self.new)
+        # Difficulty submenus
+        self.new_submenu_ai_first_submenu = Menu(self.file_new_submenu)
+        self.new_submenu_ai_first_submenu.add_command(label="Easy",command = self.new_ai_first_easy)
+        self.new_submenu_ai_first_submenu.add_command(label="Medium",command = self.new_ai_first_medium)
+        self.new_submenu_ai_first_submenu.add_command(label="Hard",command = self.new_ai_first_hard)
+        self.file_new_submenu.add_cascade(label="Computer vs. Human",menu=self.new_submenu_ai_first_submenu)
+        self.new_submenu_ai_submenu = Menu(self.file_new_submenu)
+        self.new_submenu_ai_submenu.add_command(label="Easy",command=self.new_ai_easy)
+        self.new_submenu_ai_submenu.add_command(label="Medium",command=self.new_ai_medium)
+        self.new_submenu_ai_submenu.add_command(label="Hard",command=self.new_ai_hard)
+        self.file_new_submenu.add_cascade(label="Human vs Computer",menu=self.new_submenu_ai_submenu)
+        self.file_label_menu.add_cascade(label="New Game",menu=self.file_new_submenu)
+        #
         self.file_label_menu.add_separator()
         self.file_label_menu.add_command(label="Exit",command=master.quit)
         self.themenu.add_cascade(label="File",menu=self.file_label_menu)
@@ -40,13 +56,46 @@ class TTT(object):
         self.canvas.bind("<Configure>",self.draw_board)
         self.canvas.bind("<Button-1>",self.WhichSquare)
         # Initializes Game.
-        self.g = game()
+        self.g = TTT_game.game()
         self.label_message.set(self.g.message)
+        # AI is false
+        self.use_ai = False
+
+    # AI Button wrapper functions
+    def new_ai_first_easy(self):
+        self.new_ai_first(0)
+
+    def new_ai_first_medium(self):
+        self.new_ai_first(1)
+
+    def new_ai_first_hard(self):
+        self.new_ai_first(2)
+
+    def new_ai_easy(self):
+        self.new_ai(0)
+
+    def new_ai_medium(self):
+        self.new_ai(1)
+
+    def new_ai_hard(self):
+        self.new_ai(2)
+
+    def new_ai_first(self,difficulty):
+        self.new_ai(difficulty)
+        ai_move = self.a.next_move(self.g.board,self.g.turn)
+        self.g.TakeTurn(ai_move)
+        self.drawshape(ai_move,"X")
+        self.label_message.set(self.g.message)
+
+    def new_ai(self,difficulty):
+        self.new()
+        self.use_ai = True
+        self.a = TTT_AI.AI(difficulty)
 
     def new(self):
         '''Creates new game.
         Pre: None
-        Post: resets the turtle, draws new grid, and initiates new grid class.'''
+        Post: Draws new grid, and initiates new grid class.'''
         self.label_message.set("")
         self.canvas.delete("all")
         self.g.newGame()
@@ -168,6 +217,21 @@ class TTT(object):
                     # Checking whether to draw winning symbol
                     if self.g.gameover == True:
                         self.draw_end_symbol()
+                    # If using AI
+                    elif self.use_ai == True:
+                        current_sym = self.g.turn
+                        ai_move = self.a.next_move(self.g.board, self.g.turn)
+                        if (self.g.TakeTurn(ai_move)): # Checking move
+                            self.drawshape(ai_move,current_sym)
+                            self.g.CheckEnd()
+                            self.label_message.set(self.g.message)
+                            # Checking whether to draw winning symbol
+                            if self.g.gameover == True:
+                                self.draw_end_symbol()
+                        else:
+                            print("AI gave bad move.")
+                            exit()
+                    
                 else: # Invalid Move
                     self.label_message.set(self.g.message)
             else:

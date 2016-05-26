@@ -27,6 +27,20 @@ def main():
     difficulty = int(raw_input(difficulty_message))
     a = TTT_AI.AI(difficulty)
 
+    # Asking who goes first
+    order_message = "AI first [y/n]: "
+    order = raw_input(order_message)
+    if order == "y":
+        ai_move = a.next_move(g.board,g.turn)
+        if g.TakeTurn(ai_move) == False:
+            error_message = "AI gave bad coordinate: " + str(ai_move)
+            print(error_message)
+            exit()
+    elif order != "n":
+        error_message = "Input needs to be 'y' or 'n'"
+        print(error_message)
+        exit()
+
     # Game main loop
     while g.gameover == False:
         # Beginning Output
@@ -46,6 +60,7 @@ def main():
                         g.CheckEnd() # Checking if AI made winning move or tie.
                     else:
                         error_message = "AI gave bad coordinate: " + str(ai_move)
+                        print(error_message)
                         exit()
         
     # End Message and goodbye
