@@ -5,21 +5,16 @@ import random
 from copy import deepcopy
 import TTT_game
 
-class AI_stats:
-    def __init__(self):
-        self.coordinate = -1
-        self.win = 0
-        self.lost = 0
-        self.tie = 0
-        self.reached_bottom = False
-
 class AI:
     def __init__(self,level):
         # Current time seed for random calls
         random.seed()
         # Setting difficulty level
-        if (level == 0) or (level == 1) or (level == 2):
+        if (level == 0) or (level == 1):
             self.difficulty = level # 0 for easy, 1 for medium, 2 for hard
+        elif (level == 2):
+            self.difficulty = level
+            self.hard_method = self.hard_next_move()
         else:
             errormessage = "Error setting difficulty in AI constructor.\nDifficulty given: " + str(level) + ". Needs to be either 0, 1, or 2."
             print(errormessage)
@@ -42,7 +37,10 @@ class AI:
         elif self.difficulty == 1: # Medium
             answer = self.medium_next_move(leftlist,currentboard,currentpiece)
         else: # hard
-            answer = self.hard_next_move(leftlist,currentboard,currentpiece)
+            self.leftlist = leftlist
+            self.currentboard = currentboard
+            self.currentpiece = currentpiece
+            answer = self.hard_method.next()
 
         # Returning answer
         return answer
@@ -75,118 +73,208 @@ class AI:
 
         return answer
 
-    def hard_next_move(self,leftlist,currentboard,currentpiece):
+    def hard_next_move(self):
         # Method for choosing a move based on strategy
         # Pre: The list of coordinates left to choose, the current board state as a nine
         #      character list, and the current piece to be played.
         # Post: Returns the coordinate choosen.
 
-        continue_on = True
+        # Variable setup
         favor_list = [0,2,4,6,8] # Favor corners and center
+        opponentpiece = "X"
+        if self.currentpiece == "X":
+            opponentpiece = "O"
 
-        # If AI is making first move, favor certain positions and choose randomly
-        if len(leftlist) == 9: # No previous moves have been made
-            index = random.randrange(0,5,1)
+        # AI went first
+        if len(self.leftlist) == 9: 
+            ## First Move (randomly choose from favor list
+            index = random.randrange(0,len(favor_list),1)
             answer = favor_list[index]
-            continue_on = False
+            yield answer
+            # Need to fill in rest
 
-        # If enough moves have been made to check for win or lose
-        elif len(leftlist) <= 6:
-            # Checking if a win is possible in the next move
-            winlist = self.win_next(leftlist,currentboard,currentpiece)
-            if len(winlist) > 0: # Winning move is avaliable
-                index = random.randrange(0,len(winlist),1)
-                answer = winlist[index]
-                continue_on = False
-                print("AI: I can win.")
-            else:
-                # Checking if a block is needed
-                if currentpiece == "X":
-                    nextpiece = "O"
-                else:
-                    nextpiece = "X"
-                loselist = self.win_next(leftlist,currentboard,nextpiece)
-                # Need to block
-                if len(loselist) > 0:
-                    index = random.randrange(0,len(loselist),1)
-                    answer = loselist[index]
-                    continue_on = False
-                    print("AI: I need to block.")
+        # Other Player went first    
+        else:
+            ## First Move
+            if self.currentboard[4] == ".": # Claim center if empty
+                yield 4
+                havecenter = True
+            else: # Choose randomly of corners left
+                favor_left = list(set(favor_list) & set(self.leftlist))
+                index = random.randrange(0,len(favor_left),1)
+                lastmove = answer = favor_left[index]
+                yield answer
+                havecenter = False
 
-        # If move has not yet been found
-        if continue_on:
-            if len(leftlist) == 8: # Favoring corners and center again
-                if currentboard[4] == ".":  # Claim center
-                    answer = 4
-                else: # Else choose an open corner
-                    movelist = []
-                    for coor in favor_list:
-                        if currentboard[coor] == ".":
-                            movelist.append(coor)
-                    index = random.randrange(0,len(movelist),1)
-                    answer = movelist[index]
-            else:
-                # Finding opponent's piece
-                opponentpiece = "X"
-                if currentpiece == "X":
-                    opponentpiece = "O"
-                # Checking if opponent is using corner trick
-                trick = False
-                if (currentboard[0] == opponentpiece) and (currentboard[8] == opponentpiece):
-                    trick = True
-                elif (currentboard[2] == opponentpiece) and (currentboard[6] == opponentpiece):
-                    trick = True
-                # If it was a trick
-                if trick:
-                    print("AI: Assuming corner trick.")
-                    choice_list = list(set([1,3,5,7]) & set(leftlist))
-                    index = random.randrange(0,len(choice_list),1)
-                    answer = choice_list[index]
-                # Else continue on
-                else:
-                    # Checking for split tricks
-                    trick = False
-                    if (currentboard[1] == opponentpiece) and (currentboard[8] == opponentpiece):
-                        if currentboard[2] == ".":
-                            answer = 2
-                            trick = True
-                    if (currentboard[1] == opponentpiece) and (currentboard[6] == opponentpiece):
-                        if currentboard[0] == ".":
-                            answer = 0
-                            trick = True
-                    if (currentboard[5] == opponentpiece) and (currentboard[6] == opponentpiece):
-                        if currentboard[8] == ".":
-                            answer = 8
-                            trick = True
-                    if (currentboard[5] == opponentpiece) and (currentboard[0] == opponentpiece):
-                        if currentboard[2] == ".":
-                            answer = 2
-                            trick = True
-                    if (currentboard[2] == opponentpiece) and (currentboard[7] == opponentpiece):
-                        if currentboard[8] == ".":
-                            answer = 8
-                            trick = True
-                    if (currentboard[0] == opponentpiece) and (currentboard[7] == opponentpiece):
-                        if currentboard[6] == ".":
-                            answer = 6
-                            trick = True
-                    if (currentboard[2] == opponentpiece) and (currentboard[3] == opponentpiece):
-                        if currentboard[0] == ".":
-                            answer = 0
-                            trick = True
-                    if (currentboard[3] == opponentpiece) and (currentboard[8] == opponentpiece):
-                        if currentboard[6] == ".":
-                            answer = 6
-                            trick = True
-                    if trick:
-                        print("AI: Assuming split trick.")
-                    # Else choose randomly
+            ## Second Move
+            answer = self.check_block(self.leftlist,self.currentboard,opponentpiece)
+            if answer != -1: # Need to block
+                yield answer
+            else: # Did not need to block
+                if havecenter: # Need to check for tricks
+                    # Corner Trick
+                    answer = self.check_corner_trick(self.leftlist,self.currentboard,opponentpiece)
+                    if answer != -1:
+                        yield answer
                     else:
-                        print("AI: Made it to random.")
-                        answer = self.easy_next_move(leftlist)
-                            
+                        # Split Trick
+                        answer = self.check_split_trick(self.currentboard,opponentpiece)
+                        if answer != -1:
+                            yield answer
+                        else:
+                            # L Trick
+                            answer = self.check_L_trick(self.currentboard,opponentpiece)
+                            if answer != -1:
+                                yield answer
+                            else:
+                                print("AI: Choosing randomly.")
+                                yield self.easy_next_move(self.leftlist)
+                else:
+                    # Checking bluff trick
+                    answer = self.check_bluff_trick(self.currentboard,lastmove,opponentpiece)
+                    if answer != -1:
+                        yield answer
+                    else:
+                        print("AI: Choosing randomly.")
+                        yield self.easy_next_move(self.leftlist)
+
+        ## Rest
+        while True:
+            answer = self.check_win_block(self.leftlist,self.currentboard,self.currentpiece,opponentpiece)
+            if answer != -1:
+                yield answer
+            else:
+                print("AI: Choosing Randomly.")
+                yield self.easy_next_move(self.leftlist)
+                
+    # hard_next_move support methods
+    def check_bluff_trick(self,currentboard,lastmove,opponentpiece): 
+        # Checking whether opponent is trying to bluff using center
+        ####### Should only be called on the second move for an AI that went second
+        # Pre: The current board as a nine character list, the coordinate of the AI's last move, and
+        #      the opponent's piece symbol
+        # Post: Returns coordinate if trick is discovered, -1 otherwise
+        answer = -1
+        trick = False
+        if (lastmove == 0) and (currentboard[4] == opponentpiece) and (currentboard[8] == opponentpiece):
+            trick = True
+            choicelist = [2,6]
+        elif (lastmove == 2) and (currentboard[4] == opponentpiece) and (currentboard[6] == opponentpiece):
+            trick = True
+            choicelist = [0,8]
+        elif (lastmove == 8) and (currentboard[4] == opponentpiece) and (currentboard[0] == opponentpiece):
+            trick = True
+            choicelist = [2,6]
+        elif (lastmove == 6) and (currentboard[4] == opponentpiece) and (currentboard[2] == opponentpiece):
+            trick = True
+            choicelist = [0,8]
+        if trick:
+            print("AI: Assuming bluff trick.")
+            index = random.randrange(0,2,1)
+            answer = choicelist[index]
+        return answer
+    
+    def check_L_trick(self,currentboard,opponentpiece):
+        # Checks to see if opponent is trying L trick
+        # Pre: The currentboard as a nine character list, and the opponent's piece symobl
+        # Post: Returns coordinate needed to block, -1 otherwise
+        answer = -1
+        if (currentboard[1] == opponentpiece) and (currentboard[3] == opponentpiece):
+            if currentboard[0] == ".":
+                answer = 0
+        if (currentboard[1] == opponentpiece) and (currentboard[5] == opponentpiece):
+            if currentboard[2] == ".":
+                answer = 2
+        if (currentboard[3] == opponentpiece) and (currentboard[7] == opponentpiece):
+            if currentboard[6] == ".":
+                answer = 6
+        if (currentboard[5] == opponentpiece) and (currentboard[7] == opponentpiece):
+            if currentboard[8] == ".":
+                answer = 8
+        if answer != -1:
+            print("AI: Assuming L trick.")
+        return answer
+    
+    def check_split_trick(self,currentboard,opponentpiece):
+        # Checks if opponent if trying "split" trick
+        # Pre: Currentboard board a nine character list, and opponent's piece symbol
+        # Post: Returns move if opponent is trying split trick, -1 otherwise
+        answer = -1
+        if (currentboard[1] == opponentpiece) and (currentboard[8] == opponentpiece):
+            if currentboard[2] == ".":
+                answer = 2
+        if (currentboard[1] == opponentpiece) and (currentboard[6] == opponentpiece):
+            if currentboard[0] == ".":
+                answer = 0
+        if (currentboard[5] == opponentpiece) and (currentboard[6] == opponentpiece):
+            if currentboard[8] == ".":
+                answer = 8
+        if (currentboard[5] == opponentpiece) and (currentboard[0] == opponentpiece):
+            if currentboard[2] == ".":
+                answer = 2
+        if (currentboard[2] == opponentpiece) and (currentboard[7] == opponentpiece):
+            if currentboard[8] == ".":
+                answer = 8
+        if (currentboard[0] == opponentpiece) and (currentboard[7] == opponentpiece):
+            if currentboard[6] == ".":
+                answer = 6
+        if (currentboard[2] == opponentpiece) and (currentboard[3] == opponentpiece):
+            if currentboard[0] == ".":
+                answer = 0
+        if (currentboard[3] == opponentpiece) and (currentboard[8] == opponentpiece):
+            if currentboard[6] == ".":
+                answer = 6
+        if answer != -1:
+            print("AI: Assuming Split trick")
+        return answer
+    
+    def check_corner_trick(self,leftlist,currentboard,opponentpiece):
+        # Returns coordinate if opponent is trying to use the corner trick
+        # Pre: currentboard and the opponent's piece symbol
+        # Post: Returns coordinate if opponent is trying trick, -1 otherwise
+        answer = -1
+        trick = False
+        if (currentboard[0] == opponentpiece) and (currentboard[8] == opponentpiece):
+            trick = True
+        elif (currentboard[2] == opponentpiece) and (currentboard[6] == opponentpiece):
+            trick = True
+        if trick:
+            favor_left = list(set([1,3,5,7]) & set(leftlist))
+            index = random.randrange(0,len(favor_left),1)
+            answer = favor_left[index]
+            print("AI: Assuming corner trick.")
+        return answer
+    
+    def check_win_block(self,leftlist,currentboard,currentpiece,opponentpiece):
+        # Finds whether a win is possible in the next move, or if a block will be necessary
+        # Pre: The leftlist of avaliable moves, the currentboard as a nine character list, and the current
+        #      player's piece.
+        # Post: Returns the coordinate for a win or a block if either exists, or -1
+        # Checking if a win is possible in the next move
+        winlist = self.win_next(leftlist,currentboard,currentpiece)
+        if len(winlist) > 0: # Winning move is avaliable
+            index = random.randrange(0,len(winlist),1)
+            answer = winlist[index]
+            print("AI: I can win.")
+        else:
+            answer = self.check_block(leftlist,currentboard,opponentpiece)
         return answer
 
+    def check_block(self,leftlist,currentboard,opponentpiece):
+        # Finds whether a block will be necessary on this move
+        # Pre: The leftlist of avaliable moves, the currentboard as a nine character list, and the current
+        #      player's piece.
+        # Post: Returns coordinate that needs blocked, -1 otherwise.
+        answer = -1
+        # Checking if a block is needed
+        loselist = self.win_next(leftlist,currentboard,opponentpiece)
+        # Need to block
+        if len(loselist) > 0:
+            index = random.randrange(0,len(loselist),1)
+            answer = loselist[index]
+            print("AI: I need to block.")
+        return answer
+                
     # Common Method
     def win_next(self,leftlist,currentboard,currentpiece):
         # Returns list of coordinates for leftlist that will allow the currentpiece to win after the next move
