@@ -1,8 +1,8 @@
 # Joshua Mazur
 # This file is for testing the Tic Tac Toe game class by playing it in the terminal
 
-from TTT_game import *
-from TTT_AI import *
+import TTT_game
+import TTT_AI
 
 def board_numbers():
     # Prints out the board coordinates. 
@@ -20,12 +20,12 @@ def print_board(board):
 
 def main():
     board_numbers()
-    g = game()
+    g = TTT_game.game()
 
     # Asking for AI game difficulity
     difficulty_message = "Enter game difficulity (0 for easy, 1 for medium, 2 for hard): "
     difficulty = int(raw_input(difficulty_message))
-    a = AI(difficulty)
+    a = TTT_AI.AI(difficulty)
 
     # Game main loop
     while g.gameover == False:
