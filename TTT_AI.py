@@ -19,7 +19,7 @@ class AI:
             errormessage = "Error setting difficulty in AI constructor.\nDifficulty given: " + str(level) + ". Needs to be either 0, 1, or 2."
             print(errormessage)
             exit()
-        print("**********")
+        print("** AI has intialized **")
 
     def next_move(self, currentboard, currentpiece):
         # Returns the next move the AI wished to make on the board
@@ -62,13 +62,29 @@ class AI:
         if len(leftlist) <= 5: # Minimum number of moves for a winning move to exist
             # Checking if win is possible in next move
             winlist = self.win_next(leftlist,currentboard,currentpiece)
-            if len(winlist) > 1: # More than one winning move
+            if len(winlist) > 0: # More than one winning move
                 index = random.randrange(0,len(winlist),1)
-                answer = winlist[index] # Randomly choose one
-            elif len(winlist) == 1: # One winning move
-                answer = winlist[0]
+                answer = winlist[index] 
+                print("AI: I can win.")
             else: # Currently no winning moves
-                answer = self.easy_next_move(leftlist)
+                # Checking if a move is necessary to block
+                nextpiece = "X"
+                if currentpiece == "X":
+                    nextpiece = "O"
+                loselist = self.win_next(leftlist,currentboard,nextpiece)
+                if len(loselist) > 0:
+                    # One in three chance it will choose to block the winning move
+                    chance = random.randrange(0,4,1)
+                    if chance == 0:
+                        index = random.randrange(0,len(loselist),1)
+                        answer = loselist[index]
+                        print("AI: Choosing to block.")
+                    else:
+                        # Otherwise choose randomly again
+                        answer = self.easy_next_move(leftlist)
+                else:
+                    answer = self.easy_next_move(leftlist)
+             
         else: # Minimum number of moves not yet reached
             answer = self.easy_next_move(leftlist)
 
