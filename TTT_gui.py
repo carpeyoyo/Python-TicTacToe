@@ -19,7 +19,7 @@ class TTT(object):
         self.file_label_menu = Menu(self.themenu, tearoff=0)
         # Submenu
         self.file_new_submenu = Menu(self.file_label_menu)
-        self.file_new_submenu.add_command(label="Human vs. Human",command = self.new)
+        self.file_new_submenu.add_command(label="Human vs. Human",command = self.new_human)
         # Difficulty submenus
         self.new_submenu_ai_first_submenu = Menu(self.file_new_submenu)
         self.new_submenu_ai_first_submenu.add_command(label="Easy",command = self.new_ai_first_easy)
@@ -32,7 +32,6 @@ class TTT(object):
         self.new_submenu_ai_submenu.add_command(label="Hard",command=self.new_ai_hard)
         self.file_new_submenu.add_cascade(label="Human vs Computer",menu=self.new_submenu_ai_submenu)
         self.file_label_menu.add_cascade(label="New Game",menu=self.file_new_submenu)
-        #
         self.file_label_menu.add_separator()
         self.file_label_menu.add_command(label="Exit",command=master.quit)
         self.themenu.add_cascade(label="File",menu=self.file_label_menu)
@@ -92,6 +91,10 @@ class TTT(object):
         self.new()
         self.use_ai = True
         self.a = TTT_AI.AI(difficulty)
+
+    def new_human(self):
+        self.new();
+        self.use_ai = False
 
     def new(self):
         '''Creates new game.
